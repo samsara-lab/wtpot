@@ -53,7 +53,7 @@ const Index = () => {
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-4xl">
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold mb-4">Phantom Pay Portal</h1>
+          <h1 className="text-4xl font-bold mb-4">WTPot Portal</h1>
           <p className="text-xl text-gray-600 mb-8">A pluggable payment component for your website</p>
           
           {!showPaymentForm ? (

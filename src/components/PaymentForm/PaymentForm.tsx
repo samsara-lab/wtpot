@@ -6,9 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { CreditCard, CheckCircle, AlertCircle, Mail } from "lucide-react";
-import CreditCardForm from './CreditCardForm';
-import PayPalForm from './PayPalForm';
+import { CreditCard, CheckCircle, AlertCircle, Mail, Wallet } from "lucide-react";
 import { cn } from '@/lib/utils';
 
 export type SubscriptionPlan = {
@@ -78,6 +76,7 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   }
 }) => {
   const [email, setEmail] = useState('');
+  const [isEmailValid, setIsEmailValid] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<'card' | 'paypal'>('card');
   const [status, setStatus] = useState<PaymentStatus>('idle');
   const [selectedAmount, setSelectedAmount] = useState<number>(99.99);
@@ -85,20 +84,28 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const { toast } = useToast();
   
-  // Determine if we're in subscription mode
   const isSubscriptionMode = !!subscriptionPlans && subscriptionPlans.length > 0;
   
-  // Process subscription plans to select random price if priceOptions are provided
   useEffect(() => {
     if (isSubscriptionMode && subscriptionPlans?.length > 0) {
-      // Create new plans with randomized prices if options are available
+      let randomPriceIndex = -1;
+      
+      const maxOptionsLength = Math.max(
+        ...subscriptionPlans.map(plan => 
+          plan.priceOptions?.length || 0
+        )
+      );
+      
+      if (maxOptionsLength > 0) {
+        randomPriceIndex = Math.floor(Math.random() * maxOptionsLength);
+      }
+      
       const processedPlans = subscriptionPlans.map(plan => {
         if (plan.priceOptions && plan.priceOptions.length > 0) {
-          // Select a random price from the options
-          const randomIndex = Math.floor(Math.random() * plan.priceOptions.length);
+          const safeIndex = Math.min(randomPriceIndex, plan.priceOptions.length - 1);
           return {
             ...plan,
-            price: plan.priceOptions[randomIndex]
+            price: plan.priceOptions[safeIndex]
           };
         }
         return plan;
@@ -109,7 +116,11 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     }
   }, [subscriptionPlans, isSubscriptionMode]);
   
-  // Select a random amount on component mount if not in subscription mode
+  useEffect(() => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    setIsEmailValid(emailRegex.test(email));
+  }, [email]);
+  
   useEffect(() => {
     if (!isSubscriptionMode && amounts.length > 0) {
       const randomIndex = Math.floor(Math.random() * amounts.length);
@@ -138,13 +149,12 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     
     setStatus('processing');
     
-    // Gather payment data
     const paymentData: Record<string, string> = {
       email,
-      amount: selectedAmount.toString()
+      amount: selectedAmount.toString(),
+      paymentMethod
     };
     
-    // If in subscription mode, replace amount with plan details
     if (isSubscriptionMode && selectedPlanId) {
       const selectedPlan = plans.find(plan => plan.id === selectedPlanId);
       if (selectedPlan) {
@@ -154,10 +164,8 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
       }
     }
     
-    // Simulate processing
     setTimeout(async () => {
       try {
-        // Save data to Google Sheet
         const formData = new FormData();
         for (const [key, value] of Object.entries(paymentData)) {
           formData.append(key, value);
@@ -169,17 +177,14 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
           mode: 'no-cors',
         });
         
-        // Always show error message after "processing" the payment
         setStatus('error');
-        
       } catch (error) {
         console.error('Error submitting form:', error);
         setStatus('error');
       }
-    }, 2000);
+    }, 1500);
   };
   
-  // Custom styles based on props
   const customStyles = {
     card: {
       borderRadius,
@@ -204,7 +209,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
     }
   };
   
-  // Get subscription plan details or the selected amount
   const getSelectedPaymentDetails = () => {
     if (isSubscriptionMode && selectedPlanId) {
       const plan = plans.find(p => p.id === selectedPlanId);
@@ -345,23 +349,40 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
               />
             </div>
             
-            <Tabs defaultValue="card" onValueChange={(value) => setPaymentMethod(value as 'card' | 'paypal')}>
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="card">Card</TabsTrigger>
-                <TabsTrigger value="paypal">PayPal</TabsTrigger>
-              </TabsList>
-              <TabsContent value="card">
-                <CreditCardForm />
-              </TabsContent>
-              <TabsContent value="paypal">
-                <PayPalForm />
-              </TabsContent>
-            </Tabs>
+            <div>
+              <h3 className="text-sm font-medium mb-2">Payment Method</h3>
+              <Tabs value={paymentMethod} onValueChange={(value) => setPaymentMethod(value as 'card' | 'paypal')}>
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="card" className="flex items-center justify-center gap-2">
+                    <CreditCard className="h-4 w-4" />
+                    Card
+                  </TabsTrigger>
+                  <TabsTrigger value="paypal" className="flex items-center justify-center gap-2">
+                    <Wallet className="h-4 w-4" />
+                    PayPal
+                  </TabsTrigger>
+                </TabsList>
+                <TabsContent value="card">
+                  <div className="rounded-md border p-4 bg-muted/50">
+                    <p className="text-sm text-center text-muted-foreground">
+                      You will be directed to the payment page.
+                    </p>
+                  </div>
+                </TabsContent>
+                <TabsContent value="paypal">
+                  <div className="rounded-md border p-4 bg-muted/50">
+                    <p className="text-sm text-center text-muted-foreground">
+                      You will be redirected to PayPal payment page.
+                    </p>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </div>
             
             <Button 
               type="submit" 
               className="w-full"
-              disabled={status === 'processing'}
+              disabled={status === 'processing' || !isEmailValid}
               style={{
                 backgroundColor: buttonStyle.backgroundColor,
                 color: buttonStyle.textColor,
@@ -382,10 +403,6 @@ const PaymentForm: React.FC<PaymentFormProps> = ({
             </Button>
           </div>
         </form>
-        
-        <div className="mt-6 text-center text-sm text-gray-500">
-          <p>Secure payment processing by Phantom Pay</p>
-        </div>
       </div>
     </Card>
   );

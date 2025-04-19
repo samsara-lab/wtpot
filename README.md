@@ -21,9 +21,9 @@ WTPot (Willingness-To-Pay-Pot) is an embeddable, customizable and lightweight co
 
 # Features
 
- - PayPal / Credit Card data inputs
- - payment faiure message to tell your users that "whoops something went wrong"
- - **No payment credentias are processed, saved, stored, transmitted, etc.**
- - e-Mail collection and saving into Google Sheets (API key is necessary)
+ - PayPal / Credit Card payment options
+ - payment failure message to tell your users that "whoops something went wrong"
+ - **No payment credentials are requested, processed, saved, stored, transmitted, etc.**
+ - e-Mail collection
  - randomization of the prices to test different price options
- - form shapes: singe payment or subscription plans
+ - form shapes: single payment / subscription plans

@@ -1,0 +1,119 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WTPot Widget Demo</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      line-height: 1.6;
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .container {
+      margin-top: 2rem;
+    }
+    .examples {
+      margin-top: 3rem;
+    }
+    code {
+      background-color: #f5f5f5;
+      padding: 0.2rem 0.4rem;
+      border-radius: 4px;
+      font-family: Monaco, 'Courier New', monospace;
+      font-size: 0.9em;
+    }
+    pre {
+      background-color: #f5f5f5;
+      padding: 1rem;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>WTPot Widget Demo</h1>
+  
+  <div class="container">
+    <div id="wtpot-container"></div>
+  </div>
+  
+  <div class="examples">
+    <h2>How to Use</h2>
+    <p>Include the WTPot script in your HTML:</p>
+    <pre><code>&lt;script src="https://your-domain.com/wtpot.umd.js"&gt;&lt;/script&gt;</code></pre>
+    
+    <p>Method 1: Add via data attributes</p>
+    <pre><code>&lt;div id="payment-container"&gt;&lt;/div&gt;
+&lt;script 
+  data-wtpot 
+  data-container="payment-container"
+  data-amounts="[49.99, 99.99, 149.99]"
+  data-currency="USD"
+  src="https://your-domain.com/wtpot.umd.js"&gt;
+&lt;/script&gt;</code></pre>
+    
+    <p>Method 2: Initialize programmatically</p>
+    <pre><code>&lt;div id="payment-container"&gt;&lt;/div&gt;
+&lt;script src="https://your-domain.com/wtpot.umd.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  WTPot.init({
+    containerId: "payment-container",
+    amounts: [49.99, 99.99, 149.99],
+    currency: "USD",
+    // Optional styling
+    colors: {
+      primary: "#3B82F6",
+      secondary: "#60A5FA"
+    }
+  });
+&lt;/script&gt;</code></pre>
+
+    <p>Using with subscription plans:</p>
+    <pre><code>&lt;script&gt;
+  WTPot.init({
+    containerId: "payment-container",
+    subscriptionPlans: [
+      {
+        id: "basic",
+        name: "Basic Plan",
+        description: "For individuals",
+        price: 9.99,
+        priceOptions: [7.99, 8.99, 9.99, 10.99],
+        interval: "monthly"
+      },
+      {
+        id: "pro",
+        name: "Pro Plan",
+        description: "For professionals",
+        price: 19.99,
+        priceOptions: [17.99, 19.99, 21.99, 23.99],
+        interval: "monthly"
+      }
+    ],
+    currency: "USD"
+  });
+&lt;/script&gt;</code></pre>
+  </div>
+  
+  <!-- Load the WTPot widget -->
+  <script>
+    // This will be replaced with the actual script once it's built
+    document.addEventListener("DOMContentLoaded", function() {
+      // Simple example to demo functionality without loading the script
+      const container = document.getElementById("wtpot-container");
+      container.innerHTML = '<div style="padding: 1rem; border: 1px solid #ccc; border-radius: 0.5rem; text-align: center;">' +
+        '<p>Widget would be loaded here in production.</p>' +
+        '<p>See the examples below for integration options.</p>' +
+        '</div>';
+    });
+  </script>
+</body>
+</html>
